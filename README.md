@@ -1,7 +1,7 @@
 # Inkscape Hexmap Extension
 
  This is an extension to Inkscape to draw hexmaps for board games and
- specifically megahex maps for The Fantasy Trip
+ specifically megahex maps for '[The Fantasy Trip](https://thefantasytrip.game/)
 
 # License
 
