@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<inkscape-extension xmlns="http://www.inkscape.org/namespace/inkscape/extension">
+  <name>Create Hexmap</name>
+  <id>pelles.effect.hexmap</id>
+  <param name="tab" type="notebook">
+    <page name="page_1" gui-text="Parameters">
+      <hbox>
+        <label>Size (hexes)</label>
+        <param name="size_hx" gui-text="hx" type="int" min="1" max="100">15</param>
+        <param name="size_hy" gui-text="hy" type="int" min="1" max="100">22</param>
+      </hbox>
+      <hbox>
+        <label>Origin (hex)</label>
+        <param name="origin_hx" gui-text="hx" type="int" min="-200" max="200">0</param>
+        <param name="origin_hy" gui-text="hy" type="int" min="-200" max="200">0</param>
+      </hbox>
+      <param name="Orientation" gui-text="orientation" type="optiongroup" appearance="minimal">
+        <option value="vertical">Vertical</option>
+        <option value="horizontal">Horizontal</option>
+      </param>
+      <!--
+          - Mirror yes/no
+          - Hex Shape: Hexagon, Brick, Square
+          - Style
+            - Center Dot (yes/no)
+            - Border/Vertices
+
+          - Labels
+            - Add Labels?
+            - Label Axis
+              - Hex
+              - Rectangle
+            - Label Seperator
+            - Column Letter
+
+      -->
+    </page>
+  </param>
+  <effect>
+    <object-type>all</object-type>
+    <effects-menu>
+      <submenu _name="Boardgames"/>
+    </effects-menu>
+  </effect>
+  <script>
+    <command location="inx" interpreter="python">hexmap.py</command>
+  </script>
+</inkscape-extension>
