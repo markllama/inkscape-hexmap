@@ -3,7 +3,8 @@
   <name>Create Hexmap</name>
   <id>pelles.effect.hexmap</id>
   <param name="tab" type="notebook">
-    <page name="page_1" gui-text="Parameters">
+    <page name="page_1" gui-text="Map">
+      <label appearance="header">Size and Shape</label>
       <hbox>
         <label>Size (hexes)</label>
         <param name="size_hx" gui-text="hx" type="int" min="1" max="100">15</param>
@@ -14,28 +15,64 @@
         <param name="origin_hx" gui-text="hx" type="int" min="-200" max="200">0</param>
         <param name="origin_hy" gui-text="hy" type="int" min="-200" max="200">0</param>
       </hbox>
-      <param name="Orientation" gui-text="orientation" type="optiongroup" appearance="minimal">
-        <option value="vertical">Vertical</option>
-        <option value="horizontal">Horizontal</option>
+      <param name="orientation" gui-text="Orientation" type="enum">
+        <item value="vertical">Vertical</item>
+        <item value="horizontal">Horizontal</item>
       </param>
-      <!--
-          - Mirror yes/no
+      <param name="coordinate-system" gui-text="Coordinate System" type="enum">
+        <item value="rectangular">Cartesian</item>
+        <item value="triangular">Triangular</item>
+        <item value="vee">V-Shape</item>
+      </param>
+      <param name="wrap" gui-text="Wrap" type="boolean">false</param>
+      <param name="mirror" gui-text="Mirror" type="boolean">false</param>
+      <param name="colshift" gui-text="Column Shift" type="boolean">false</param>     
+    </page>
+    <page name="page_2" gui-text="Hexes" >
+      <label appearance="header">Drawing Style</label>
+      <param name="hexshape" gui-text="Shape" type="enum">
+        <item value="hex">Hexagon</item>
+        <item value="brick">Rectangle</item>
+        <item value="square">Square</item>
+      </param>
+      <param name="border" gui-text="Border" type="enum">
+        <item value="solid">Solid</item>
+        <item value="vertices">Vertices</item>
+        <item value="fill">Fill</item>
+        <item value="none">None</item>
+      </param>
 
-          - Hex Shape: Hexagon, Brick, Square
-          - Style
-            - Center Dot (yes/no)
-            - Border/Vertices
-          - Labels
-            - Add Labels?
-            - Label Axis
-              - Hex
-              - Rectangle
-            - Label Seperator
-            - Column Letter
+      <param name="borderwidth" type="float" min="0.0" max="9999.0" gui-text="Border Width">1.0</param>
+      <param name="units" type="enum" gui-text="Drawing Units">
+               <item value="mm">mm</item>
+               <item value="cm">cm</item>
+               <item value="in">in</item>
+               <item value="pt">pt</item>
+               <item value="px">px</item>
+            </param>
+      <param name="vertexsize" type="int" min="0" max="50" gui-text="Length of vertex lines (%)">10.0</param>
+ 
+      <param name="centerdots" gui-text="Center Dots" type="boolean">true</param>
+      <param name="dotsize" type="int" min="0" max="50" gui-text="Center Dot Size (%)">10</param>
 
-
-
-      -->
+      <separator/>
+      <label appearance="header">Coordinate Labels</label>
+      <param name="labels" gui-text="Label Hexes" type="boolean">true</param>
+      <param name="label-seperator" gui-text="Label Seperator" type="string">,</param>
+      <param name="label-grouping" gui-text="Label Grouping" type="enum">
+        <item value="none">None</item>
+        <item value="parentheses">Parentheses ()</item>
+        <item value="bracees">Braces {}</item>
+        <item value="brackets">Brackets []</item>
+      </param>
+      <param name="label-swap" gui-text="Swap x &lt;-%gt; y"
+      <param name="label-zeros" gui-text="Zero Fill" type="boolean">false</param>
+      <param name="label-letters" gui-text="Letter Columns" type="boolean">false</param>
+    </page>
+    <page name="page_3" gui-text="Logging">
+      <label appearance="header">Debug Logging</label>
+      <param name="log" type="bool" gui-text="Generate log file">false</param>
+      <param name="logfilepath" type="path" gui-text="Log File (optional)" mode="file_new" filetypes="txt">debug.txt</param>
     </page>
   </param>
   <effect>
