@@ -20,11 +20,11 @@
       </param>
       <!--
           - Mirror yes/no
+
           - Hex Shape: Hexagon, Brick, Square
           - Style
             - Center Dot (yes/no)
             - Border/Vertices
-
           - Labels
             - Add Labels?
             - Label Axis
@@ -32,6 +32,8 @@
               - Rectangle
             - Label Seperator
             - Column Letter
+
+
 
       -->
     </page>
