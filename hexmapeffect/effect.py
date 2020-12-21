@@ -60,4 +60,15 @@ class Effect(inkex.Effect):
         """
         TBD
         """
+
+        # create hexmap
+        # - shape (rectangle)
+        # - size
+        # - origin
+        # - coordinate_system
+
+        # create svghexmap
+
+        # for each hex in the map
+        # - draw it on the hex map
         pass
