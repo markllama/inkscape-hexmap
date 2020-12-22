@@ -1,5 +1,8 @@
 import inkex
 
+from hexvector import HexVector
+from hexmap import HexMap
+
 class Effect(inkex.Effect):
     """
     TBD
@@ -49,7 +52,7 @@ class Effect(inkex.Effect):
         p.add_argument("--label-grouping",
                        choices=['parentheses', 'brackets', 'braces', 'none'],
                        default='none')
-        p.add_argument("--label-swap", type=inkex.Booean, default=False)
+        p.add_argument("--label-swap", type=inkex.Boolean, default=False)
         p.add_argument("--label-zeros", type=inkex.Boolean, default=False)
         p.add_argument("--label-letters", type=inkex.Boolean, default=False)
 
@@ -61,6 +64,10 @@ class Effect(inkex.Effect):
         TBD
         """
 
+        size = HexVector(self.options.size_hx, self.options.size_hy)
+        origin = HexVector(self.options.origin_hx, self.options.origin_hy)
+        
+        hm = HexMap(size, origin)
         # create hexmap
         # - shape (rectangle)
         # - size

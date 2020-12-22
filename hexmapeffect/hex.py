@@ -28,6 +28,22 @@ class Hex:
         return c
 
     @property
+    def vertices(self):
+        """
+        Return the set of points offset from the center of a hex that represent
+        the vertices of a hex.
+        """
+        hm = self.hexmap
+        return [
+            Point(-hm.hexrun, -hm.hexrise),
+            Point(hm.hexrun, -hm.hexrise),
+            Point(hm.hexside, 0),
+            Point(hm.hexrun, hm.hexrise),
+            Point(-hm.hexrun, hm.hexrise),
+            Point(-hm.hexside, 0)
+        ]
+
+    @property
     def nodes(self):
         """
         Produce the set of points that represent the corners of this hex

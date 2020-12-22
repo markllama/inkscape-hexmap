@@ -4,7 +4,7 @@ from hex import Hex
 from hexvector import HexVector
 from point import Point
 
-class HexMap:
+class HexGrid:
     """
     This class represents an entire hexagonal map
     """
