@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<inkscape-extension xmlns="http://www.inkscape.org/namespace/inkscape/extension">
+    <name>Create Hexmap</name>
+    <id>pelles.effect.hexmap</id>
+    <param name="tab" type="notebook">
+        <page name="page_1" gui-text="Size and Style">
+            <label appearance="header">Dimensions</label>
+            <hbox>
+              <label>Size:</label>
+              <param name="size-hx" type="int" gui-text="size hx" min="1" max="100">10</param>
+              <param name="size-hy" type="int" gui-text="size hy" min="1" max="100">10</param>
+            </hbox>
+            <hbox>
+              <label>Origin:</label>
+              <param name="origin-hx" type="int" gui-text="origin hx" min="-100" max="100">0</param>
+              <param name="origin-hy" type="int" gui-text="origin hy" min="-100" max="100">0</param>
+            </hbox>
+            <param name="orientation" type="enum" gui-text="Grid Orientation">
+              <item value="vertical">Vertical</item>
+              <item value="horizontal">Horizontal</item>
+            </param>
+            <param name="pad" type="bool" gui-text="Pad and Center on the page">false</param>
+            <param name="tileshape" type="enum" gui-text="Tile Shape">
+              <item value="hex">Hexagon</item>
+              <item value="brick">Brick</item>
+              <item value="square">Square</item>
+            </param>
+            <param name="border-style" type="enum" gui-text="Border Style">
+              <item value="solid">Solid</item>
+              <item value="vertex">Vertex</item>
+            </param>
+            <param name="tic-size" type="int" gui-text="Vertex tic size(%)" min="10" max="90">25</param>
+            <label appearance="header">Layout</label>
+            <param name="wrap-x" type="bool" gui-text="Wrap left and right edges">false</param>
+            <param name="wrap-y" type="bool" gui-text="Wrap top to bottom edges">false</param>
+            <param name="reverse-x" type="bool" gui-text="Number hexes right toleft">false</param>
+            <param name="reverse-y" type="bool" gui-text="Number hexes bottom to top">false</param>
+            <param name="sawtooth" type="bool" gui-text="First column half-hex down">false</param>
+        </page>
+        <page name="page_2" gui-text="Drawing">
+            <param name="units" type="enum" appearance="combo" gui-text="Drawing Units">
+               <item value="mm">mm</item>
+               <item value="cm">cm</item>
+               <item value="in">in</item>
+               <item value="pt">pt</item>
+               <item value="px">px</item>
+            </param>
+            <param name="hexsize" type="float" min="0" max="9999" gui-text="Hex Size (optional)" />
+              <param name="strokewidth" type="float" min="0.0" max="9999.0" gui-text="Stroke Width">1.0</param>
+        </page>
+        <page name="page_3" gui-text="Labels">
+            <hbox>
+              <label>First Label</label>
+              <param name="coordcolstart" type="int" gui-text="hx" min="0" max="1000">1</param>
+              <param name="coordrowstart" type="int" gui-text="hy" min="0" max="1000">1</param>
+            </hbox>
+            <param name="coordrows" type="int" min="1" max="100" gui-text="Step (rows)">1</param>
+            <param name="coordseparator" type="string" gui-text="Coordinate Separator">.</param>
+            <param name="coordalphacol" type="bool" gui-text="Column Alpha Coordinates">false</param>
+            <param name="coordrevrow" type="bool" gui-text="Row Coordinates Reversed">false</param>
+            <param name="coordrowfirst" type="bool" gui-text="Row Coordinate First">false</param>
+            <param name="coordzeros" type="bool" gui-text="Zero-Padded Coordinates">true</param>
+        </page>
+    </param>
+    <effect>
+        <object-type>all</object-type>
+        <effects-menu>
+           <submenu _name="Boardgames"/>
+        </effects-menu>
+    </effect>
+    <script>
+        <command location="inx" interpreter="python">hexmap.py</command>
+    </script>
+</inkscape-extension>
