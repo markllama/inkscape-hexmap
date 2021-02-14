@@ -395,7 +395,6 @@ class HexCanvas:
         unit = self._svg.unittouu
         size = Point(float(unit(self._svg.get('width'))),
                      float(unit(self._svg.get('height'))))
-        size -= Point(self.stroke_width * 2, self.stroke_width * 2)
         if self._spec['orientation'] == 'horizontal':
             size = size.swap
         return size
@@ -409,9 +408,13 @@ class HexCanvas:
         """
         TBD
         """
-        return self._svg.unittouu(
-            str(self._spec['stroke_width']) + self._spec['units']
-        )
+        csize = self.size
+        if self._spec['orientation'] == 'vertical':
+            return (self._spec['stroke_width'] / self.grid.size.hx) * csize.x
+        else:
+            return (self._spec['stroke_width'] / self.grid.size.hy) * csize.y
+            
+        #self.size.x / (self.grid.size.hx + (0.05 /self.grid.size.hx))
 
     @property
     def tile_size(self):
@@ -430,7 +433,7 @@ class HexCanvas:
         if self._spec['wrap_x']:
             hexrun = csize.x / ((self.grid.size.hx - 1) * 3)
         else:
-            hexrun = csize.x / ((self.grid.size.hx * 3) + 1)
+            hexrun = (csize.x - self.stroke_width) / ((self.grid.size.hx * 3) + 1)
 
         # The height of a hex is cos(pi/6) * the width
         # hexrise is 1/2 of a hex height
@@ -439,7 +442,7 @@ class HexCanvas:
         # TODO - check the canvas y as well and pick the smallest dimension
         #        that allows the entire hexgrid to pack within the canvas
         if hexrise * ((self.grid.size.hy * 2) + 1) > csize.y:
-            hexrise = csize.y / ((self.grid.size.hy * 2) + 1)
+            hexrise = (csize.y - self.stroke_width) / ((self.grid.size.hy * 2) + 1)
             hexrun = hexrise / ( 2 * 0.8660254 )
 
         return Point(hexrun, hexrise)
@@ -474,7 +477,7 @@ class HexCanvas:
 
         # offset to center the map on the page
         offset_x = 0 if self._spec['wrap_x'] else dim.x * 2
-        origin = Point(offset_x, dim.y) + Point(self.stroke_width, self.stroke_width)
+        origin = Point(offset_x, dim.y) + Point(self.stroke_width/2, self.stroke_width/2)
         if self._spec['pad']:
             origin += self.padding
         return origin
@@ -551,8 +554,7 @@ class HexmapEffect(inkex.Effect):
                                  help="Units this dialog is using")
         # Hex size is calculated by default
         draw_parser.add_argument('--hexsize', type = float, default = 0.0)
-        draw_parser.add_argument('--strokewidth', type = float, default = 1.0)
-        draw_parser.add_argument('--verticesize', type = float, default = 1.0)
+        draw_parser.add_argument('--strokewidth', type = float, default = 2.5)
 
         # Label Spec and Layout
         self._add_label_parser()
@@ -584,7 +586,7 @@ class HexmapEffect(inkex.Effect):
             'sawtooth': self.options.sawtooth,
             # drawing spec
             'units': self.options.units,
-            'stroke_width': self.options.strokewidth
+            'stroke_width': self.options.strokewidth / 100.0
         }
 
         return spec

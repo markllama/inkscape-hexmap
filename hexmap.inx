@@ -46,7 +46,7 @@
                <item value="px">px</item>
             </param>
             <param name="hexsize" type="float" min="0" max="9999" gui-text="Hex Size (optional)" />
-              <param name="strokewidth" type="float" min="0.0" max="9999.0" gui-text="Stroke Width">1.0</param>
+              <param name="strokewidth" type="float" min="0.5" max="10.0" gui-text="Stroke Width (% of hex width)">2.5</param>
         </page>
         <page name="page_3" gui-text="Labels">
             <hbox>
