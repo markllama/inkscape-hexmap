@@ -6,8 +6,8 @@
     <page name="page_1" gui-text="Size and Style">
       <label appearance="header">Dimensions</label>
       <hbox>
-        <label>Coordinate System</label>
-        <param name="coordinate-system" type="enum" gui-text="Cooordinate System">
+        <label>Geometry</label>
+        <param name="geometry" type="enum" gui-text="Hexmap Cooordinate System">
           <item value="rectangle">Rectangle</item>
           <item value="triangle">Triangle</item>
           <item value="herringbone">Herringbone</item>

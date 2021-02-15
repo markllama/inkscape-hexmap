@@ -355,6 +355,14 @@ class HexGridRectangle:
                 #location = HexVector(col, row
                 yield HexVector(col, row)
         
+    def ybias(self, col):
+        """
+        Adjust the set of rows to create a rectangular grid for drawing
+        """
+        # Adjust so negative columns are properly shifted
+        c = col if col >= 0 else c - 1
+        return int(col / 2)
+    
     def edge(self, hexloc):
         """
         Determine if the hex is on an edge and if so, which one?
@@ -380,14 +388,6 @@ class HexGridTriangle(HexGridRectangle):
     TBD
     """
 
-    def ybias(self, col):
-        """
-        Adjust the set of rows to create a rectangular grid for drawing
-        """
-        # Adjust so negative columns are properly shifted
-        c = col if col >= 0 else c - 1
-        return int(col / 2)
-    
     @property
     def column(self, col):
         """
@@ -407,12 +407,20 @@ class HexGridTriangle(HexGridRectangle):
         col_start = self._origin.hx
         col_end = col_start + self._size.hx 
         for col in range(col_start, col_end):
-            row_start = self._origin.hy - self.ybias(col)
+            row_start = self._origin.hy + self.ybias(col)
             row_end = row_start + self._size.hy
             for row in range(row_start, row_end):
                 #location = HexVector(col, row
                 yield HexVector(col, row)
 
+    def ybias(self, col):
+        """
+        Adjust the set of rows to create a rectangular grid for drawing
+        """
+        # Adjust so negative columns are properly shifted
+        c = col if col >= 0 else c - 1
+        return int(col / 2)
+    
 
 class HexGridHerringbone(HexGridRectangle):
     pass
@@ -535,7 +543,6 @@ class HexCanvas:
         dim = self.tile_size
         return Point(dim.x * 3, dim.y * 2)
 
-
     def tile_center(self, hexloc):
         """
         Find the center point of a tile on the grid
@@ -544,8 +551,12 @@ class HexCanvas:
         # Convert the hexvector to a point
         normalized = hexloc - self.grid.origin
         multiplier = Point(normalized.hx, normalized.hy)
-        coldown = 1 if self._spec['sawtooth'] else 0
-        ybias = Point(0, ((hexloc.hx + coldown) % 2) * self.tile_size.y)
+        coldown = 0 if self._spec['sawtooth'] else 1
+        if self._spec['geometry'] == 'rectangle':
+            ybias = Point(0, ((hexloc.hx + coldown) % 2) * self.tile_size.y)
+        elif self._spec['geometry'] == 'triangle':
+            ybias = Point(0, (((hexloc.hx + coldown) % 2) - (self.grid.ybias(hexloc.hx) * 2)) * self.tile_size.y)
+
         # Calculate the center
         c = (multiplier * self.tile_step) + self.tile_origin + ybias
         if self._spec['orientation'] == 'horizontal':
@@ -618,12 +629,13 @@ class HexmapEffect(inkex.Effect):
         Collect the map parameters for easy access
         """
         # TBD - check the value of the grid selection
-        grid = HexmapEffect._grids[self.options.coordinate_system](
+        grid = HexmapEffect._grids[self.options.geometry](
             HexVector(self.options.size_hx, self.options.size_hy),
             HexVector(self.options.origin_hx,self.options.origin_hy),
             self.options.wrap_x)
 
         spec = {
+            'geometry': self.options.geometry,
             'grid': grid,
             'orientation': self.options.orientation, # or horizontal
             'pad': self.options.pad,
@@ -650,7 +662,7 @@ class HexmapEffect(inkex.Effect):
         add Map dimension and layout arguments
         """
         map_parser = self.arg_parser.add_argument_group("map parameters")
-        map_parser.add_argument('--coordinate-system',
+        map_parser.add_argument('--geometry',
                                 choices = ['rectangle', 'triangle', 'herringbone'],
                                 default = 'rectangle',
                                 help = "Hexmap Coordinate System")
