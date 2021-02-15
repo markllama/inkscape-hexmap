@@ -19,7 +19,6 @@
               <item value="vertical">Vertical</item>
               <item value="horizontal">Horizontal</item>
             </param>
-            <param name="pad" type="bool" gui-text="Pad and Center on the page">false</param>
             <param name="tileshape" type="enum" gui-text="Tile Shape">
               <item value="hex">Hexagon</item>
               <item value="brick">Brick</item>
@@ -28,9 +27,13 @@
             <param name="border-style" type="enum" gui-text="Border Style">
               <item value="solid">Solid</item>
               <item value="vertex">Vertex</item>
+              <item value="none">None</item>
             </param>
             <param name="tic-size" type="int" gui-text="Vertex tic size(%)" min="10" max="90">25</param>
+            <param name="center-dot" type="bool" gui-text="Draw center dots in each hex">true</param>
+            <param name="label" type="bool" gui-text="Label each hex">true</param>
             <label appearance="header">Layout</label>
+            <param name="pad" type="bool" gui-text="Pad and Center on the page">false</param>
             <param name="wrap-x" type="bool" gui-text="Wrap left and right edges">false</param>
             <param name="wrap-y" type="bool" gui-text="Wrap top to bottom edges">false</param>
             <param name="reverse-x" type="bool" gui-text="Number hexes right toleft">false</param>
@@ -49,8 +52,8 @@
               <param name="strokewidth" type="float" min="0.5" max="10.0" gui-text="Stroke Width (% of hex width)">2.5</param>
         </page>
         <page name="page_3" gui-text="Labels">
-            <hbox>
-              <label>First Label</label>
+          <hbox>
+            <label>First Label</label>
               <param name="coordcolstart" type="int" gui-text="hx" min="0" max="1000">1</param>
               <param name="coordrowstart" type="int" gui-text="hy" min="0" max="1000">1</param>
             </hbox>

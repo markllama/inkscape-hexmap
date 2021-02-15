@@ -192,7 +192,7 @@ class HexTile:
         p = c + self.label_offset
         return p
         
-    def draw(self, stroke, orientation, border='solid', tic_size=0.25):
+    def draw(self, stroke, orientation, border='solid', tic_size=0.25, dot=True):
         """
         Draw the complete hex
 
@@ -202,19 +202,19 @@ class HexTile:
         """
 
         group = etree.Element('g')
-        group.set('style', 'stroke:#000000; stroke-width:'
+        group.set('style', 'stroke:#cccccc; stroke-width:'
                   + str(stroke) + ';stroke-linecap:round')
 
         v = self.vertices(orientation)
         if border == 'solid':
             group.append(self._polyline(v))
-        else:
+        elif border == 'vertex':
             for t in self._tics(v, tic_size):
                 group.append(t)
             
         # or append corners
         # Append dots
-        if self._side in ['interior', 'top', 'bottom']:
+        if (dot and self._side in ['interior', 'top', 'bottom']):
             c = self._center
             group.append(self._circle(stroke, c))
 
@@ -406,16 +406,16 @@ class HexCanvas:
     @property
     def stroke_width(self):
         """
-        TBD
+        The width of lines drawn for borders and vertices.
+        A percentage of the total width or height of a hex
         """
         csize = self.size
+        # Define the stroke width as a percentage of the size of one hex
         if self._spec['orientation'] == 'vertical':
             return (self._spec['stroke_width'] / self.grid.size.hx) * csize.x
         else:
             return (self._spec['stroke_width'] / self.grid.size.hy) * csize.y
             
-        #self.size.x / (self.grid.size.hx + (0.05 /self.grid.size.hx))
-
     @property
     def tile_size(self):
         """
@@ -579,6 +579,8 @@ class HexmapEffect(inkex.Effect):
             'tile_shape': self.options.tileshape,
             'border_style': self.options.border_style,
             'tic_size': self.options.tic_size / 200,  # 1/2 of a percentage
+            'center_dot': self.options.center_dot,
+            'label': self.options.label,
             'wrap_x': self.options.wrap_x,
             'wrap_y': self.options.wrap_y,
             'reverse_x': False,
@@ -633,12 +635,17 @@ class HexmapEffect(inkex.Effect):
                                 default = 'hex',
                                 help = 'The shape for each tile in the map')
         map_parser.add_argument('--border-style',
-                                choices = ['solid', 'vertex'],
+                                choices = ['solid', 'vertex', 'none'],
                                 default = 'solid',
                                 help = 'How to draw the hex border: solid or vertices')
         map_parser.add_argument('--tic-size', type = int, default = '25',
                                 help = 'Size of corner tics in % of side')
-        
+        map_parser.add_argument('--center-dot', type = inkex.Boolean,
+                                default = True,
+                                help = "Draw a dot at the center of each hex")
+        map_parser.add_argument('--label', type = inkex.Boolean,
+                                default = True,
+                                help = "Label each hex")
     @property
     def label_spec(self):
         """
@@ -719,10 +726,12 @@ class HexmapEffect(inkex.Effect):
                 hexcanvas.stroke_width,
                 hexcanvas._spec['orientation'],
                 hexcanvas._spec['border_style'],
-                hexcanvas._spec['tic_size']
+                hexcanvas._spec['tic_size'],
+                hexcanvas._spec['center_dot']
             ))
-            label = HexLabel(hexloc, edge)
-            layer.append(label.draw(tile.label_center, tilesize.y/5))
+            if self.options.label:
+                label = HexLabel(hexloc, edge)
+                layer.append(label.draw(tile.label_center, tilesize.y/5))
 
 # ============================================================================
 #
