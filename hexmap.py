@@ -316,7 +316,7 @@ class HexLabel:
         return label
 
 
-class HexGrid:
+class HexGridRectangle:
     """
     This class represents the descrete locations on a hexmap
     """
@@ -341,8 +341,8 @@ class HexGrid:
     def column(self, col):
         """
         """
-        for row in range(self._size.hy):
-            location = Hex
+        for row in range(self._origin.hy, self._size.hy + self._origin.hy):
+            #location = HexVector(col, row
             yield HexVector(col, row)
 
     @property
@@ -374,6 +374,48 @@ class HexGrid:
             return 'bottom'
 
         return 'interior'
+
+class HexGridTriangle(HexGridRectangle):
+    """
+    TBD
+    """
+
+    def ybias(self, col):
+        """
+        Adjust the set of rows to create a rectangular grid for drawing
+        """
+        # Adjust so negative columns are properly shifted
+        c = col if col >= 0 else c - 1
+        return int(col / 2)
+    
+    @property
+    def column(self, col):
+        """
+        Columns in a triangular grid are biased to form a rectangle for
+        mapping
+        """
+        ybias = self.ybias(col)
+        for row in range(ybias, self._size.hy + ybias):
+            location = Hex
+            yield HexVector(col, row)
+
+    @property
+    def hexes(self):
+        """
+        A generator that iterates over all of the hexes in the map
+        """
+        col_start = self._origin.hx
+        col_end = col_start + self._size.hx 
+        for col in range(col_start, col_end):
+            row_start = self._origin.hy - self.ybias(col)
+            row_end = row_start + self._size.hy
+            for row in range(row_start, row_end):
+                #location = HexVector(col, row
+                yield HexVector(col, row)
+
+
+class HexGridHerringbone(HexGridRectangle):
+    pass
 
 class HexCanvas:
     """
@@ -563,14 +605,24 @@ class HexmapEffect(inkex.Effect):
 # -----------------------------------------------------------------------------
 # Argument Parser Groups
 # -----------------------------------------------------------------------------
+
+    _grids = {
+        'rectangle': HexGridRectangle,
+        'triangle': HexGridTriangle,
+        'herringbone': HexGridHerringbone
+    }
+
     @property
     def map_spec(self):
         """
         Collect the map parameters for easy access
         """
-        grid = HexGrid(HexVector(self.options.size_hx, self.options.size_hy),
-                       HexVector(self.options.origin_hx,self.options.origin_hy),
-                       self.options.wrap_x)
+        # TBD - check the value of the grid selection
+        grid = HexmapEffect._grids[self.options.coordinate_system](
+            HexVector(self.options.size_hx, self.options.size_hy),
+            HexVector(self.options.origin_hx,self.options.origin_hy),
+            self.options.wrap_x)
+
         spec = {
             'grid': grid,
             'orientation': self.options.orientation, # or horizontal
@@ -598,6 +650,10 @@ class HexmapEffect(inkex.Effect):
         add Map dimension and layout arguments
         """
         map_parser = self.arg_parser.add_argument_group("map parameters")
+        map_parser.add_argument('--coordinate-system',
+                                choices = ['rectangle', 'triangle', 'herringbone'],
+                                default = 'rectangle',
+                                help = "Hexmap Coordinate System")
         map_parser.add_argument('--size-hx', type = int, default = '10',
                                 help = 'Number of columns')
         map_parser.add_argument('--size-hy', type = int, default = '10',
@@ -720,7 +776,11 @@ class HexmapEffect(inkex.Effect):
         for hexloc in hexcanvas.grid.hexes:
             
             center = hexcanvas.tile_center(hexloc)
+
+            #if shift:
             edge = hexcanvas.grid.edge(hexloc)
+            # else: edge = 'interior'
+
             tile = HexTile(center, tilesize, edge)
             layer.append(tile.draw(
                 hexcanvas.stroke_width,
