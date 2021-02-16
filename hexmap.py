@@ -388,15 +388,13 @@ class HexGridTriangle(HexGridRectangle):
     TBD
     """
 
-    @property
     def column(self, col):
         """
         Columns in a triangular grid are biased to form a rectangle for
         mapping
         """
         ybias = self.ybias(col)
-        for row in range(ybias, self._size.hy + ybias):
-            location = Hex
+        for row in range(ybias, self._size.hy + ybias.hy):
             yield HexVector(col, row)
 
     @property
@@ -407,10 +405,8 @@ class HexGridTriangle(HexGridRectangle):
         col_start = self._origin.hx
         col_end = col_start + self._size.hx 
         for col in range(col_start, col_end):
-            row_start = self._origin.hy + self.ybias(col)
-            row_end = row_start + self._size.hy
-            for row in range(row_start, row_end):
-                #location = HexVector(col, row
+            ybias = self.ybias(col)
+            for row in range(ybias, self._size.hy + ybias):
                 yield HexVector(col, row)
 
     def ybias(self, col):
@@ -423,7 +419,26 @@ class HexGridTriangle(HexGridRectangle):
     
 
 class HexGridHerringbone(HexGridRectangle):
-    pass
+    @property
+    def hexes(self):
+        """
+        A generator that iterates over all of the hexes in the map
+        """
+        col_start = self._origin.hx - int(self._size.hx / 2)
+        col_end = col_start + self._size.hx
+        for col in range(col_start, col_end):
+            
+            ybias = self.ybias(col)
+            for row in range(ybias, self._size.hy + ybias):
+                yield HexVector(col+row, row)
+
+    def ybias(self, col):
+        """
+        Adjust the set of rows to create a rectangular grid for drawing
+        """
+        # Adjust so negative columns are properly shifted
+        c = col if col >= 0 else col - 1
+        return int(c / 2)
 
 class HexCanvas:
     """
@@ -553,12 +568,18 @@ class HexCanvas:
         multiplier = Point(normalized.hx, normalized.hy)
         coldown = 0 if self._spec['sawtooth'] else 1
         if self._spec['geometry'] == 'rectangle':
+            xbias = Point(0, 0)
             ybias = Point(0, ((hexloc.hx + coldown) % 2) * self.tile_size.y)
         elif self._spec['geometry'] == 'triangle':
+            xbias = Point(0, 0)
             ybias = Point(0, (((hexloc.hx + coldown) % 2) - (self.grid.ybias(hexloc.hx) * 2)) * self.tile_size.y)
+        elif self._spec['geometry'] == 'herringbone':
+            bias = self.grid.ybias(hexloc.hx)
+            xbias = Point(-3 * self.tile_size.x * hexloc.hy, self.tile_size.y * hexloc.hy)
+            ybias = Point(0, (((hexloc.hx + coldown) % 2) - (bias * 2)) * self.tile_size.y)
 
         # Calculate the center
-        c = (multiplier * self.tile_step) + self.tile_origin + ybias
+        c = ((multiplier * self.tile_step) + self.tile_origin + ybias) + xbias
         if self._spec['orientation'] == 'horizontal':
             c = c.swap
         return c
