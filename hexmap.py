@@ -368,8 +368,8 @@ class HexGridRectangle:
         Adjust the set of rows to create a rectangular grid for drawing
         """
         # Adjust so negative columns are properly shifted
-        c = col if col >= 0 else c - 1
-        return int(col / 2)
+        c = col if col >= 0 else col - 1
+        return int(c / 2)
     
     def edge(self, hexloc):
         """
