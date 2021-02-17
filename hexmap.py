@@ -354,7 +354,15 @@ class HexGridRectangle:
             for row in range(self._origin.hy, self._size.hy + self._origin.hy):
                 #location = HexVector(col, row
                 yield HexVector(col, row)
-        
+
+    def translate(self, hexloc):
+        """
+        Convert the hex location to units of hexrun and hexrise
+        """
+        # triangle
+        #return Point(hexloc.hx, hexloc.hy - (hexloc.hx / 2))
+        return Point(hexloc.hx, hexloc.hy - ((hexloc.hx % 2)/2))
+
     def ybias(self, col):
         """
         Adjust the set of rows to create a rectangular grid for drawing
@@ -409,13 +417,12 @@ class HexGridTriangle(HexGridRectangle):
             for row in range(ybias, self._size.hy + ybias):
                 yield HexVector(col, row)
 
-    def ybias(self, col):
+    def translate(self, hexloc):
         """
-        Adjust the set of rows to create a rectangular grid for drawing
+        Convert the hex location to units of hexrun and hexrise
         """
-        # Adjust so negative columns are properly shifted
-        c = col if col >= 0 else c - 1
-        return int(col / 2)
+        # triangle
+        return Point(hexloc.hx, hexloc.hy - (hexloc.hx / 2))
     
 
 class HexGridHerringbone(HexGridRectangle):
@@ -432,13 +439,13 @@ class HexGridHerringbone(HexGridRectangle):
             for row in range(ybias, self._size.hy + ybias):
                 yield HexVector(col+row, row)
 
-    def ybias(self, col):
+    def translate(self, hexloc):
         """
-        Adjust the set of rows to create a rectangular grid for drawing
+        Convert the hex location to units of hexrun and hexrise
         """
-        # Adjust so negative columns are properly shifted
-        c = col if col >= 0 else col - 1
-        return int(c / 2)
+        # herringbone
+        return Point(hexloc.hx - hexloc.hy, hexloc.hy + hexloc.hz/2)
+
 
 class HexCanvas:
     """
@@ -555,8 +562,7 @@ class HexCanvas:
         horizontal and vertical distance between one hex and the next in
         each dimension
         """
-        dim = self.tile_size
-        return Point(dim.x * 3, dim.y * 2)
+        return self.tile_size * Point(3, 2)
 
     def tile_center(self, hexloc):
         """
@@ -565,21 +571,7 @@ class HexCanvas:
         """
         # Convert the hexvector to a point
         normalized = hexloc - self.grid.origin
-        multiplier = Point(normalized.hx, normalized.hy)
-        coldown = 0 if self._spec['sawtooth'] else 1
-        if self._spec['geometry'] == 'rectangle':
-            xbias = Point(0, 0)
-            ybias = Point(0, ((hexloc.hx + coldown) % 2) * self.tile_size.y)
-        elif self._spec['geometry'] == 'triangle':
-            xbias = Point(0, 0)
-            ybias = Point(0, (((hexloc.hx + coldown) % 2) - (self.grid.ybias(hexloc.hx) * 2)) * self.tile_size.y)
-        elif self._spec['geometry'] == 'herringbone':
-            bias = self.grid.ybias(hexloc.hx)
-            xbias = Point(-3 * self.tile_size.x * hexloc.hy, self.tile_size.y * hexloc.hy)
-            ybias = Point(0, (((hexloc.hx + coldown) % 2) - (bias * 2)) * self.tile_size.y)
-
-        # Calculate the center
-        c = ((multiplier * self.tile_step) + self.tile_origin + ybias) + xbias
+        c = self.tile_origin + (self.grid.translate(normalized) * self.tile_step)
         if self._spec['orientation'] == 'horizontal':
             c = c.swap
         return c
