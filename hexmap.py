@@ -338,14 +338,6 @@ class HexGridRectangle:
         return self._origin
     
     @property
-    def column(self, col):
-        """
-        """
-        for row in range(self._origin.hy, self._size.hy + self._origin.hy):
-            #location = HexVector(col, row
-            yield HexVector(col, row)
-
-    @property
     def hexes(self):
         """
         A generator that iterates over all of the hexes in the map
@@ -395,15 +387,6 @@ class HexGridTriangle(HexGridRectangle):
     """
     TBD
     """
-
-    def column(self, col):
-        """
-        Columns in a triangular grid are biased to form a rectangle for
-        mapping
-        """
-        ybias = self.ybias(col)
-        for row in range(ybias, self._size.hy + ybias.hy):
-            yield HexVector(col, row)
 
     @property
     def hexes(self):
