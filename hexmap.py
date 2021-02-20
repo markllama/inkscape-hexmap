@@ -323,7 +323,84 @@ class HexLabel:
 
         return label
 
+# ============================================================================
+# Grid classes
+#   These generate a list of hexes in a specified shape
+# ============================================================================
+class RadialHexGrid:
+    """
+    TBD
+    """
 
+    def __init__(self, size, origin=HexVector.ORIGIN):
+        """
+        TBD
+        """
+        self._size = size
+
+    @property
+    def _radius(self):
+        """
+        The radius of a radial hexgrid is the length of the size vector
+        """
+        return max(abs(self._size.hx), abs(self._size.hy))
+
+    def column(self,hx):
+        """
+        Produce a list of the hexes in the indicated column
+        """
+        # column 0
+        radius = self._radius
+        min = -radius if hx < 0 else -radius + hx
+        max = radius if hx > 0 else radius - hx
+        for hy in range(min, max + 1):
+            yield HexVector(hx, hy) + self._origin
+
+    @property
+    def hexes(self):
+        """
+        Produce a list of hexes in a radial map, column by column
+        """
+        # column 0
+        radius = self._radius
+        for hx in range(-radius, radius + 1):
+            # A radial hex map is a truncated parallelogram
+            min = -radius if hx < 0 else -radius + hx
+            max = radius if hx > 0 else radius - hx
+            for hy in range(min, max + 1):
+                yield HexVector(hx, hy) + self._origin
+
+class RectangularHexGrid(RadialHexGrid):
+    """
+    TBD
+    """
+
+    def _ybias(self, hx):
+        """
+        """
+        return self.hx % 2
+
+    def column(self,hx):
+        """
+        TBD
+        """
+        min = self._ybias
+        for hy in range(min, min + self._size.hy):
+            yield HexVector(hx, hy) + self._origin
+
+    @property
+    def hexes(self):
+        """
+        """
+        for hx in range(0, self._size.hx):
+            min = self._ybias
+            for hy in range(min, min + self._size.hy):
+                yield HexVector(hx, hy) + self._origin
+
+
+# ============================================================================
+# Combined grid and placement classes
+# ============================================================================
 class HexGridRectangle:
     """
     This class represents the descrete locations on a hexmap
@@ -350,10 +427,10 @@ class HexGridRectangle:
         """
         A generator that iterates over all of the hexes in the map
         """
-        for col in range(self._origin.hx, self._size.hx + self._origin.hx):
-            for row in range(self._origin.hy, self._size.hy + self._origin.hy):
+        for col in range(0, self._size.hx):
+            for row in range(0, self._size.hy):
                 #location = HexVector(col, row
-                yield HexVector(col, row)
+                yield HexVector(col, row) + self._origin
 
     def translate(self, hexloc):
         """
