@@ -393,19 +393,17 @@ class HexGridTriangle(HexGridRectangle):
         """
         A generator that iterates over all of the hexes in the map
         """
-        col_start = self._origin.hx
-        col_end = col_start + self._size.hx 
-        for col in range(col_start, col_end):
+        for col in range(0, self._size.hx):
             ybias = self.ybias(col)
             for row in range(ybias, self._size.hy + ybias):
-                yield HexVector(col, row)
+                yield HexVector(col, row) + self._origin
 
     def translate(self, hexloc):
         """
         Convert the hex location to units of hexrun and hexrise
         """
         # triangle
-        return Point(hexloc.hx, hexloc.hy - (hexloc.hx / 2))
+        return Point(hexloc.hx, hexloc.hy - (hexloc.hx /2))
     
 
 class HexGridHerringbone(HexGridRectangle):
