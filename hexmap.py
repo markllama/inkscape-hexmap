@@ -112,6 +112,14 @@ class HexVector:
         raise ValueError("operand of HexVector addition must be a HexVector")
 
 HexVector.ORIGIN = HexVector()
+HexVector.UNIT = [
+    HexVector(0, -1),
+    HexVector(1, 0),
+    HexVector(1, 1),
+    HexVector(0, 1),
+    HexVector(-1, 0),
+    HexVector(-1, -1)
+]
 
 
 class HexTile:
