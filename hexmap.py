@@ -532,7 +532,7 @@ class HexCanvas:
 
         # offset to center the map on the page
         offset_x = 0 if self._spec['wrap_x'] else dim.x * 2
-        origin = Point(offset_x, dim.y) + Point(self.stroke_width/2, self.stroke_width/2)
+        origin = Point(offset_x, dim.y * 2) + Point(self.stroke_width/2, self.stroke_width/2)
         if self._spec['pad']:
             origin += self.padding
         return origin
