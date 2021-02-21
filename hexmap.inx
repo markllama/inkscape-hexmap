@@ -6,10 +6,17 @@
     <page name="page_1" gui-text="Size and Style">
       <label appearance="header">Dimensions</label>
       <hbox>
+        <label>Shape</label>
+        <param name="geometry" type="enum" gui-text="Hexmap Shape">
+          <item value="rectangle">Rectangle</item>
+          <item value="radial">Radial</item>
+        </param>
+      </hbox>
+      <hbox>
         <label>Geometry</label>
         <param name="geometry" type="enum" gui-text="Hexmap Cooordinate System">
-          <item value="rectangle">Rectangle</item>
           <item value="triangle">Triangle</item>
+          <item value="rectangle">Rectangle</item>
           <item value="herringbone">Herringbone</item>
         </param>
       </hbox>

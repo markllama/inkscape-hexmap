@@ -74,6 +74,9 @@ class HexVector:
     def __str__(self):
         return "{},{}".format(self._hx, self._hy)
 
+    def __repr__(self):
+        return "<{},{}>".format(self._hx, self._hy)
+
     @property
     def hx(self):
         return self._hx
@@ -89,6 +92,13 @@ class HexVector:
     @property
     def swap(self):
         return HexVector(self._hy, self._hx)
+
+    @property
+    def length(self):
+        """
+        TBD
+        """
+        return max(abs(self._hx), abs(self._hy), abs(self.hz))
 
     # comparison operators
     def __eq__(self, other):
@@ -110,6 +120,16 @@ class HexVector:
         if isinstance(other, HexVector):
             return HexVector(self._hx - other.hx, self._hy - other.hy)    
         raise ValueError("operand of HexVector addition must be a HexVector")
+
+    def rotate(self, hextant):
+        """
+        TBD
+        """
+        # This can be made more efficient with a table lookup for a lambda
+        h = hextant % 6
+        if h == 0:
+            return self
+        return HexVector(-self.hz, self.hx).rotate(h - 1)
 
 HexVector.ORIGIN = HexVector()
 HexVector.UNIT = [
@@ -326,10 +346,12 @@ class HexLabel:
 # ============================================================================
 # Grid classes
 #   These generate a list of hexes in a specified shape
+#   They can be re-mapped to different hex locationl labelling schemes
 # ============================================================================
 class RadialHexGrid:
     """
-    TBD
+    A radial hex grid is a set of hex rings centered on the origin
+    The size of a radial hex grid is specified in as the length of a HexVector
     """
 
     def __init__(self, size, origin=HexVector.ORIGIN):
@@ -337,6 +359,7 @@ class RadialHexGrid:
         TBD
         """
         self._size = size
+        self._origin = origin
 
     @property
     def _radius(self):
@@ -353,24 +376,33 @@ class RadialHexGrid:
         radius = self._radius
         min = -radius if hx < 0 else -radius + hx
         max = radius if hx > 0 else radius - hx
-        for hy in range(min, max + 1):
+        for hy in range(min, max):
             yield HexVector(hx, hy) + self._origin
 
     @property
     def hexes(self):
         """
-        Produce a list of hexes in a radial map, column by column
+        Produce a list of hexes in a radial map, ring by ring
+        Take advantage of the rotational symmetry of the triangluar lattice
         """
         # column 0
         radius = self._radius
-        for hx in range(-radius, radius + 1):
-            # A radial hex map is a truncated parallelogram
-            min = -radius if hx < 0 else -radius + hx
-            max = radius if hx > 0 else radius - hx
-            for hy in range(min, max + 1):
-                yield HexVector(hx, hy) + self._origin
+        
+        # The first time, just give the center hex
+        yield HexVector.ORIGIN
+        
+        # produce each ring, starting at the center
+        for ring in range(1, radius + 1):
+            # start at hextant 0 on the axis
+            for step in range(0, ring):
+                # step along the side
+                h0 = HexVector(step, -ring + step)
+                # produce this hex in each hextant
+                for hextant in range(0, 6):
+                    yield h0.rotate(hextant)
 
-class RectangularHexGrid(RadialHexGrid):
+
+class RectangleHexGrid(RadialHexGrid):
     """
     TBD
     """
@@ -378,13 +410,13 @@ class RectangularHexGrid(RadialHexGrid):
     def _ybias(self, hx):
         """
         """
-        return self.hx % 2
+        return hx % 2
 
     def column(self,hx):
         """
         TBD
         """
-        min = self._ybias
+        min = self._ybias(hx)
         for hy in range(min, min + self._size.hy):
             yield HexVector(hx, hy) + self._origin
 
@@ -393,10 +425,9 @@ class RectangularHexGrid(RadialHexGrid):
         """
         """
         for hx in range(0, self._size.hx):
-            min = self._ybias
+            min = self._ybias(hx)
             for hy in range(min, min + self._size.hy):
                 yield HexVector(hx, hy) + self._origin
-
 
 # ============================================================================
 # Combined grid and placement classes
@@ -697,6 +728,11 @@ class HexmapEffect(inkex.Effect):
 # -----------------------------------------------------------------------------
 
     _grids = {
+        'rectange': RectangleHexGrid,
+        'radial': RadialHexGrid
+    }
+
+    _geometries = {
         'rectangle': HexGridRectangle,
         'triangle': HexGridTriangle,
         'herringbone': HexGridHerringbone
@@ -708,13 +744,14 @@ class HexmapEffect(inkex.Effect):
         Collect the map parameters for easy access
         """
         # TBD - check the value of the grid selection
-        grid = HexmapEffect._grids[self.options.geometry](
+        grid = HexmapEffect._grids[self.options.shape](
             HexVector(self.options.size_hx, self.options.size_hy),
-            HexVector(self.options.origin_hx,self.options.origin_hy),
-            self.options.wrap_x)
+            HexVector(self.options.origin_hx,self.options.origin_hy))
+
+        geometry = HexmapEffect._geometies[self.options.geometry]()
 
         spec = {
-            'geometry': self.options.geometry,
+            'geometry': geometry,
             'grid': grid,
             'orientation': self.options.orientation, # or horizontal
             'pad': self.options.pad,
@@ -741,6 +778,9 @@ class HexmapEffect(inkex.Effect):
         add Map dimension and layout arguments
         """
         map_parser = self.arg_parser.add_argument_group("map parameters")
+        map_parser.add_argument('--shape', choices = ['rectangle', 'radial'],
+                                default = 'rectangle',
+                                help = "Hexmap Shape")
         map_parser.add_argument('--geometry',
                                 choices = ['rectangle', 'triangle', 'herringbone'],
                                 default = 'rectangle',
@@ -889,4 +929,4 @@ class HexmapEffect(inkex.Effect):
 # After defining everything, make it go
 #
 # ============================================================================
-HexmapEffect().run()
+#HexmapEffect().run()
