@@ -1,3 +1,5 @@
+from .hexvector import *
+
 # ============================================================================
 # Grid classes
 #   These generate a list of hexes in a specified shape
@@ -9,12 +11,15 @@ class RadialHexGrid:
     The size of a radial hex grid is specified in as the length of a HexVector
     """
 
-    def __init__(self, size, origin=HexVector.ORIGIN):
+    def __init__(self, size):
         """
         TBD
         """
         self._size = size
-        self._origin = origin
+
+    @property
+    def size(self):
+        return self._size
 
     @property
     def _radius(self):
@@ -62,11 +67,6 @@ class RectangleHexGrid(RadialHexGrid):
     TBD
     """
 
-    def _ybias(self, hx):
-        """
-        """
-        return hx % 2
-
     def column(self,hx):
         """
         TBD
@@ -80,6 +80,6 @@ class RectangleHexGrid(RadialHexGrid):
         """
         """
         for hx in range(0, self._size.hx):
-            min = self._ybias(hx)
+            min = hx % 2
             for hy in range(min, min + self._size.hy):
                 yield HexVector(hx, hy) + self._origin
