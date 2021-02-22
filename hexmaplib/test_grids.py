@@ -2,13 +2,14 @@
 
 import unittest
 
-from hexmap import HexVector, RadialHexGrid, RectangleHexGrid
+from hexvector import HexVector
+from grid import RadialHexGrid, RectangleHexGrid
 
 class TestRadialHexGrid(unittest.TestCase):
 
     def test_contructor(self):
 
-        radial0 = RadialHexGrid(HexVector(3,0), HexVector.ORIGIN)
+        radial0 = RadialHexGrid(HexVector(3,0))
 
         self.assertEqual(len(list(radial0.hexes)), 37)
 #        print(list(rg0.hexes))

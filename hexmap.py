@@ -408,8 +408,7 @@ class HexmapEffect(inkex.Effect):
         """
         # TBD - check the value of the grid selection
         grid = HexmapEffect._grids[self.options.shape](
-            HexVector(self.options.size_hx, self.options.size_hy),
-            HexVector(self.options.origin_hx,self.options.origin_hy))
+            HexVector(self.options.size_hx, self.options.size_hy))
 
         geometry = HexmapEffect._geometries[self.options.geometry](
             HexVector(self.options.size_hx, self.options.size_hy))
