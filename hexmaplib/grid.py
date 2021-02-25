@@ -37,7 +37,7 @@ class RadialHexGrid:
         min = -radius if hx < 0 else -radius + hx
         max = radius if hx > 0 else radius - hx
         for hy in range(min, max):
-            yield HexVector(hx, hy) + self._origin
+            yield HexVector(hx, hy)
 
     @property
     def hexes(self):
@@ -73,7 +73,7 @@ class RectangleHexGrid(RadialHexGrid):
         """
         min = self._ybias(hx)
         for hy in range(min, min + self._size.hy):
-            yield HexVector(hx, hy) + self._origin
+            yield HexVector(hx, hy)
 
     @property
     def hexes(self):
@@ -82,4 +82,4 @@ class RectangleHexGrid(RadialHexGrid):
         for hx in range(0, self._size.hx):
             min = hx % 2
             for hy in range(min, min + self._size.hy):
-                yield HexVector(hx, hy) + self._origin
+                yield HexVector(hx, hy)
