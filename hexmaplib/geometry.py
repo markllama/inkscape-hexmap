@@ -20,6 +20,10 @@ system to a common alternate.  The 'forward' method transforms from grid to map
 coordinates.  The 'reverse' function transforms from map to canonical grid
 location.
 
+Given a grid, each geometry object also provides placement of each node within
+the grid. That is, it can report the distance of each node from the edge of the
+grid in terms of HexVector and Tiles.
+
 [1] https://en.wikipedia.org/wiki/Triangular_tiling
 [2] https://mathbitsnotebook.com/Algebra2/Functions/FNOneOnto2.html
 """

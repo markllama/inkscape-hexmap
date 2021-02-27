@@ -1,4 +1,5 @@
-from .hexvector import *
+from .hexvector import HexVector
+from .point import Point
 
 # ============================================================================
 # Grid classes
@@ -60,6 +61,36 @@ class RadialHexGrid:
                 # produce this hex in each hextant
                 for hextant in range(0, 6):
                     yield h0.rotate(hextant)
+
+    @property
+    def _rectheight(self):
+        """
+        TBD
+        """
+        return (self._radius * 4) - 2
+
+    @property
+    def _rectwidth(self):
+        """
+        TBD
+        """
+        return (self._radius * 6) - 2
+
+    @property
+    def _rectorigin(self):
+        """
+        TBD
+        """
+        return Point(self._rectwidth / 2,  self._rectheight / 2)
+        
+    def rectloc(self, loc):
+        """
+        Return the rectangular coordinate of the hex location in multiples
+        of hexrun and hexrise.
+        For a radial grid, the origin hex is in the center of the rectangular
+        space.
+        """
+        return self._rectorigin + (Point(loc.hx, loc.hy) * Point(3, 2))
 
 
 class RectangleHexGrid(RadialHexGrid):

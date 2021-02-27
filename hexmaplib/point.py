@@ -18,6 +18,17 @@ class Point:
         """
         return '%f,%f' % (self.x, self.y)
 
+    # comparison operators
+    def __eq__(self, other):
+        if isinstance(other, Point):
+            return self.x == other.x and self.y == other.y
+        return False
+
+    def __ne__(self, other):
+        if isinstance(other, Point):
+            return self.x != other.x or self.y != other.y
+        return True
+
     def __sub__(self, other):
         """
         Cartesian vector subtraction
