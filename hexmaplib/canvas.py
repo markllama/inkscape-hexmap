@@ -1,3 +1,75 @@
+#
+#
+#
+from .point import Point
+from .hexvector import HexVector
+
+class Canvas:
+    """
+    A Canvas is an extension of an SVG object that is tuned to place objects
+    in a triangular tiling on a cartesian coordinate space.
+    """
+
+
+    def __init__(self, svg, gridsize, orientation="vertical"):
+        self._svg = svg
+        self._gridsize = gridsize
+        self._orientation = orientation
+
+    @property
+    def size(self):
+        """
+        Return the size of the svg canvas as a Point object
+        """
+        unit = self._svg.unittouu
+        size = Point(float(unit(self._svg.get('width'))),
+                     float(unit(self._svg.get('height'))))
+        if self._orientation == 'horizontal':
+            size = size.swap
+        return size
+
+    @property
+    def stroke_width(self):
+        """
+        The width of lines drawn for borders and vertices.
+        A percentage of the total width or height of a hex
+        """
+        csize = self.size
+        # Define the stroke width as a percentage of the size of one hex
+        if self._spec['orientation'] == 'vertical':
+            return (self._spec['stroke_width'] / self._gridsize.hx) * csize.x
+        else:
+            return (self._spec['stroke_width'] / self._gridsize.hy) * csize.y
+            
+    @property
+    def tile_size(self):
+        """
+        Determine the hexrise and hexrun dimensions of a hex by fitting
+        a hexgrid into the canvas dimensions.
+        Hexes pack so that the columns are only 3/4 as wide as one hex
+        dim.x = hexrun = hexside / 2 = hexwidth / 4
+        dim.y = hexrise = hexheight / 2
+        """
+        # TODO - Adjust for brick and square tiles
+        csize = self.size
+
+        # hexrun is the basic dimension of a hex
+        # it is 1/2 of a hexside and 1/4 of the longest 'diameter' of a hex
+        hexrun = (csize.x - self.stroke_width) / ((self._gridsize.hx * 3) + 1)
+
+        # The height of a hex is cos(pi/6) * the width
+        # hexrise is 1/2 of a hex height
+        hexrise = (hexrun * 2) * 0.8660254
+
+        # TODO - check the canvas y as well and pick the smallest dimension
+        #        that allows the entire hexgrid to pack within the canvas
+        if hexrise * ((self._gridsize.hy * 2) + 1) > csize.y:
+            hexrise = (csize.y - self.stroke_width) / ((self._gridsize.hy * 2) + 1)
+            hexrun = hexrise / ( 2 * 0.8660254 )
+
+        return Point(hexrun, hexrise)
+
+
 class HexCanvas:
     """
     Draw the tiles on the SVG document
@@ -21,10 +93,6 @@ class HexCanvas:
         if self._spec['orientation'] == 'horizontal':
             size = size.swap
         return size
-
-    @property
-    def grid(self):
-        return self._spec['grid']
 
     @property
     def stroke_width(self):
@@ -126,4 +194,4 @@ class HexCanvas:
         if self._spec['orientation'] == 'horizontal':
             c = c.swap
         return c
-<
+
