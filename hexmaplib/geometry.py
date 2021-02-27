@@ -60,16 +60,35 @@ class RectangleGeometry(TriangleGeometry):
         """
         Transform the map coordinate to the canonical grid
         """
-        bias = int(src.hx / 2)
-        return HexVector(src.hx, src.hy + bias) + self._origin
+        normal = src - self._origin
+        bias = int(normal.hx / 2)
+        return HexVector(normal.hx, normal.hy + bias)
 
     def tomap(self, dst):
         """
         Transform a grid coordinate to the map location
         """
         bias = int(dst.hx / 2)
-        return HexVector(dst.hx, dst.hy - bias) - self._origin
+        return self._origin + HexVector(dst.hx, dst.hy - bias)
 
 
 class HerringboneGeometry(TriangleGeometry):
-    pass
+    """
+    Herringbone geometry is drawn with a hex with hx=0 in one upper corner
+    and hy=0 in the other.  The hx=hy axis runs down the center spine of
+    a rectangular grid. This means that unlike the triangle grid, the
+    axes are at 120 degrees instead of 60.
+    """
+
+    def togrid(self, src):
+        """
+        TBD
+        """
+        return HexVector(-src.hz, src.hx)
+
+    def tomap(self, src):
+        """
+        TBD
+        """
+        return HexVector(src.hy, src.hz)
+
