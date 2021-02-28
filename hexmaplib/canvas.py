@@ -11,10 +11,11 @@ class Canvas:
     """
 
 
-    def __init__(self, svg, gridsize, orientation="vertical"):
+    def __init__(self, svg, gridsize, orientation="vertical", stroke_percent=0.05):
         self._svg = svg
         self._gridsize = gridsize
         self._orientation = orientation
+        self._stroke_percent = stroke_percent
 
     @property
     def size(self):
@@ -36,10 +37,10 @@ class Canvas:
         """
         csize = self.size
         # Define the stroke width as a percentage of the size of one hex
-        if self._spec['orientation'] == 'vertical':
-            return (self._spec['stroke_width'] / self._gridsize.hx) * csize.x
+        if self._orientation == 'vertical':
+            return (self._stroke_percent / float(self._gridsize.hx)) * csize.x
         else:
-            return (self._spec['stroke_width'] / self._gridsize.hy) * csize.y
+            return (self._stroke_percent / float(self._gridsize.hy)) * csize.y
             
     @property
     def tile_size(self):
