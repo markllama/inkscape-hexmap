@@ -114,3 +114,10 @@ class RectangleHexGrid(RadialHexGrid):
             min = hx % 2
             for hy in range(min, min + self._size.hy):
                 yield HexVector(hx, hy)
+
+    @property
+    def _rectorigin(self):
+        """
+        TBD
+        """
+        return Point(1,  2)
