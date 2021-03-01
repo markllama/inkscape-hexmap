@@ -8,7 +8,6 @@ from lxml import etree
 
 from hexmaplib import *
 
-
 class HexLabel:
     """
     This class represents and draws a hex coordinate label
@@ -32,309 +31,6 @@ class HexLabel:
         label.set('y', str(loc.y))
 
         return label
-
-# ============================================================================
-# Grid classes
-#   These generate a list of hexes in a specified shape
-#   They can be re-mapped to different hex locationl labelling schemes
-# ============================================================================
-class RadialHexGrid:
-    """
-    A radial hex grid is a set of hex rings centered on the origin
-    The size of a radial hex grid is specified in as the length of a HexVector
-    """
-
-    def __init__(self, size, origin=HexVector.ORIGIN):
-        """
-        TBD
-        """
-        self._size = size
-        self._origin = origin
-
-    @property
-    def _radius(self):
-        """
-        The radius of a radial hexgrid is the length of the size vector
-        """
-        return max(abs(self._size.hx), abs(self._size.hy))
-
-    def column(self,hx):
-        """
-        Produce a list of the hexes in the indicated column
-        """
-        # column 0
-        radius = self._radius
-        min = -radius if hx < 0 else -radius + hx
-        max = radius if hx > 0 else radius - hx
-        for hy in range(min, max):
-            yield HexVector(hx, hy) + self._origin
-
-    @property
-    def hexes(self):
-        """
-        Produce a list of hexes in a radial map, ring by ring
-        Take advantage of the rotational symmetry of the triangluar lattice
-        """
-        # column 0
-        radius = self._radius
-        
-        # The first time, just give the center hex
-        yield HexVector.ORIGIN
-        
-        # produce each ring, starting at the center
-        for ring in range(1, radius + 1):
-            # start at hextant 0 on the axis
-            for step in range(0, ring):
-                # step along the side
-                h0 = HexVector(step, -ring + step)
-                # produce this hex in each hextant
-                for hextant in range(0, 6):
-                    yield h0.rotate(hextant)
-
-
-# ============================================================================
-# Combined grid and placement classes
-# ============================================================================
-class HexGridRectangle:
-    """
-    This class represents the descrete locations on a hexmap
-    """
-
-    def __init__(self, size, origin=HexVector.ORIGIN, shift=False):
-        """
-        TBD
-        """
-        self._size = size
-        self._origin = origin
-        self._shift = shift
-
-    @property
-    def size(self):
-        return self._size
-
-    @property
-    def origin(self):
-        return self._origin
-    
-    @property
-    def hexes(self):
-        """
-        A generator that iterates over all of the hexes in the map
-        """
-        for col in range(0, self._size.hx):
-            for row in range(0, self._size.hy):
-                #location = HexVector(col, row
-                yield HexVector(col, row) + self._origin
-
-    def translate(self, hexloc):
-        """
-        Convert the hex location to units of hexrun and hexrise
-        """
-        # triangle
-        #return Point(hexloc.hx, hexloc.hy - (hexloc.hx / 2))
-        return Point(hexloc.hx, hexloc.hy - ((hexloc.hx % 2)/2))
-
-    def ybias(self, col):
-        """
-        Adjust the set of rows to create a rectangular grid for drawing
-        """
-        # Adjust so negative columns are properly shifted
-        c = col if col >= 0 else col - 1
-        return int(c / 2)
-    
-    def edge(self, hexloc):
-        """
-        Determine if the hex is on an edge and if so, which one?
-        """
-
-        if self._shift is False:
-            return 'interior'
-
-        if (hexloc.hx - self._origin.hx) == 0:
-            return 'left'
-        elif self._size.hx - (hexloc.hx - self._origin.hx) == 1:
-            return 'right'
-
-        if (hexloc.hy - self._origin.hy) == 0:
-            return 'top'
-        elif self._size.hy - (hexloc.hy - self._origin.hy) == 1:
-            return 'bottom'
-
-        return 'interior'
-
-class HexGridTriangle(HexGridRectangle):
-    """
-    TBD
-    """
-
-    @property
-    def hexes(self):
-        """
-        A generator that iterates over all of the hexes in the map
-        """
-        for col in range(0, self._size.hx):
-            ybias = self.ybias(col)
-            for row in range(ybias, self._size.hy + ybias):
-                yield HexVector(col, row) + self._origin
-
-    def translate(self, hexloc):
-        """
-        Convert the hex location to units of hexrun and hexrise
-        """
-        # triangle
-        return Point(hexloc.hx, hexloc.hy - (hexloc.hx /2))
-    
-
-class HexGridHerringbone(HexGridRectangle):
-    @property
-    def hexes(self):
-        """
-        A generator that iterates over all of the hexes in the map
-        """
-        col_start = self._origin.hx - int(self._size.hx / 2)
-        col_end = col_start + self._size.hx
-        for col in range(col_start, col_end):
-            
-            ybias = self.ybias(col)
-            for row in range(ybias, self._size.hy + ybias):
-                yield HexVector(col+row, row)
-
-    def translate(self, hexloc):
-        """
-        Convert the hex location to units of hexrun and hexrise
-        """
-        # herringbone
-        return Point(hexloc.hx - hexloc.hy, hexloc.hy + hexloc.hz/2)
-
-
-class HexCanvas:
-    """
-    Draw the tiles on the SVG document
-    """
-
-    def __init__(self, svg, map_spec):
-        """
-        Store and initialize the elements to draw the map
-        """
-        self._svg = svg
-        self._spec = map_spec
-
-    @property
-    def size(self):
-        """
-        Return the size of the svg canvas as a Point object
-        """
-        unit = self._svg.unittouu
-        size = Point(float(unit(self._svg.get('width'))),
-                     float(unit(self._svg.get('height'))))
-        if self._spec['orientation'] == 'horizontal':
-            size = size.swap
-        return size
-
-    @property
-    def grid(self):
-        return self._spec['grid']
-
-    @property
-    def stroke_width(self):
-        """
-        The width of lines drawn for borders and vertices.
-        A percentage of the total width or height of a hex
-        """
-        csize = self.size
-        # Define the stroke width as a percentage of the size of one hex
-        if self._spec['orientation'] == 'vertical':
-            return (self._spec['stroke_width'] / self.grid.size.hx) * csize.x
-        else:
-            return (self._spec['stroke_width'] / self.grid.size.hy) * csize.y
-            
-    @property
-    def tile_size(self):
-        """
-        Determine the hexrise and hexrun dimensions of a hex by fitting
-        a hexgrid into the canvas dimensions.
-        Hexes pack so that the columns are only 3/4 as wide as one hex
-        dim.x = hexrun = hexside / 2 = hexwidth / 4
-        dim.y = hexrise = hexheight / 2
-        """
-        # TODO - Adjust for brick and square tiles
-        csize = self.size
-
-        # hexrun is the basic dimension of a hex
-        # it is 1/2 of a hexside and 1/4 of the longest 'diameter' of a hex
-        if self._spec['wrap_x']:
-            hexrun = csize.x / ((self.grid.size.hx - 1) * 3)
-        else:
-            hexrun = (csize.x - self.stroke_width) / ((self.grid.size.hx * 3) + 1)
-
-        # The height of a hex is cos(pi/6) * the width
-        # hexrise is 1/2 of a hex height
-        hexrise = (hexrun * 2) * 0.8660254
-
-        # TODO - check the canvas y as well and pick the smallest dimension
-        #        that allows the entire hexgrid to pack within the canvas
-        if hexrise * ((self.grid.size.hy * 2) + 1) > csize.y:
-            hexrise = (csize.y - self.stroke_width) / ((self.grid.size.hy * 2) + 1)
-            hexrun = hexrise / ( 2 * 0.8660254 )
-
-        return Point(hexrun, hexrise)
-
-    @property
-    def padding(self):
-        """
-        Determine how much space exists on the page outside the boundaries
-        of the hex grid
-        """
-        tdim = self.tile_size
-        if self._spec['wrap_x'] is False:
-            msize = Point(tdim.x * ((self.grid.size.hx * 3) + 1),
-                          tdim.y * ((self.grid.size.hy * 2) + 1))
-
-        else:
-            msize = Point(tdim.x * ((self.grid.size.hx - 1) * 3),
-                          tdim.y * ((self.grid.size.hy * 2) + 1))
-
-        s = self.size
-        excess = (s - msize)
-        pad = Point(excess.x / 2, excess.y / 2)
-
-        return pad
-
-    @property
-    def tile_origin(self):
-        """
-        Find the center point of the origin tile on the canvas
-        """
-        dim = self.tile_size
-
-        # offset to center the map on the page
-        offset_x = 0 if self._spec['wrap_x'] else dim.x * 2
-        origin = Point(offset_x, dim.y * 2) + Point(self.stroke_width/2, self.stroke_width/2)
-        if self._spec['pad']:
-            origin += self.padding
-        return origin
-
-
-    @property
-    def tile_step(self):
-        """
-        This a vector where the two coordinates correspond to the
-        horizontal and vertical distance between one hex and the next in
-        each dimension
-        """
-        return self.tile_size * Point(3, 2)
-
-    def tile_center(self, hexloc):
-        """
-        Find the center point of a tile on the grid
-        Multiply the hexloc coords by the tile_step and add the tile_origin
-        """
-        # Convert the hexvector to a point
-        normalized = hexloc - self.grid.origin
-        c = self.tile_origin + (self.grid.translate(normalized) * self.tile_step)
-        if self._spec['orientation'] == 'horizontal':
-            c = c.swap
-        return c
 
 # -------------------------------------------------------------------------
 # Layer creation and management
@@ -396,9 +92,9 @@ class HexmapEffect(inkex.Effect):
     }
 
     _geometries = {
-        'triangle': HexGridTriangle,
-        'rectangle': HexGridRectangle,
-        'herringbone': HexGridHerringbone
+        'triangle': TriangleGeometry,
+        'rectangle': RectangleGeometry,
+        'herringbone': HerringboneGeometry
     }
 
     @property
@@ -556,8 +252,13 @@ class HexmapEffect(inkex.Effect):
         svg = self.document.xpath('//svg:svg' , namespaces=NSS)[0]
         layer = createLayer('hexmap')
         append_if_new_name(svg, layer)
-        
-        hexcanvas = HexCanvas(svg, self.map_spec)
+
+        gridsize = HexVector(self.options.size_hx, self.options.size_hy)
+        gridorigin = HexVector(self.options.origin_hx, self.options.origin_hy)
+        hexcanvas = Canvas(svg, gridsize)
+        # TBD - check the value of the grid selection
+        grid = HexmapEffect._grids[self.options.shape](gridsize)
+        geometry = HexmapEffect._geometries[self.options.geometry](gridorigin)
 
         # --------------------------------------------------------------------
         #
@@ -565,26 +266,27 @@ class HexmapEffect(inkex.Effect):
 
         tilesize = hexcanvas.tile_size
         tilestep = hexcanvas.tile_step
+        padding = hexcanvas.padding
 
         # draw all of the hexes in the grid
-        for hexloc in hexcanvas.grid.hexes:
+        for gridloc in grid.hexes:
+
+            # get the placement of the tile from the geometry
+            maploc = geometry.tomap(gridloc)
+            # get the location of that placement from the canvas
             
-            center = hexcanvas.tile_center(hexloc)
-
-            #if shift:
-            edge = hexcanvas.grid.edge(hexloc)
-            # else: edge = 'interior'
-
-            tile = HexTile(center, tilesize, edge)
+            # multiply that by the tile step and add the padding
+            center = (Point(maploc) * tilestep) + padding
+            tile = Tile(center, tilesize)
             layer.append(tile.draw(
                 hexcanvas.stroke_width,
-                hexcanvas._spec['orientation'],
-                hexcanvas._spec['border_style'],
-                hexcanvas._spec['tic_size'],
-                hexcanvas._spec['center_dot']
+                self.options.orientation,
+                self.options.border_style,
+                self.options.tic_size,
+                self.options.center_dot
             ))
             if self.options.label:
-                label = HexLabel(hexloc, edge)
+                label = HexLabel(gridloc, 'interior')
                 layer.append(label.draw(tile.label_center, tilesize.y/5))
 
 # ============================================================================

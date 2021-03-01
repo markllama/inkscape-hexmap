@@ -71,6 +71,13 @@ class Canvas:
         return Point(hexrun, hexrise)
 
     @property
+    def tile_step(self):
+        """
+        TBD
+        """
+        return self.tile_size * Point(3, 2)
+
+    @property
     def padding(self):
         """
         Determine how much space exists on the page outside the boundaries

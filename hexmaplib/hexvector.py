@@ -61,6 +61,30 @@ class HexVector:
             return HexVector(self._hx - other.hx, self._hy - other.hy)    
         raise ValueError("operand of HexVector addition must be a HexVector")
 
+    def __mul__(self, k):
+        """
+        Cartesian dot-product of a vector and scalar value
+        """
+        if isinstance(k, HexVector):
+            return HexVector(self.hx * k.hx, self.hy * k.hy)
+
+        if isinstance(k, int) or isinstance(k, float):
+            return HexVector(self.hx * k, self.hy * k)
+
+        raise ValueError("point muliplier must be hexvector or scalar")
+
+    def __truediv__(self, k):
+        """
+        Inverse Cartesian dot-product of a vector and scalar value
+        """
+        if isinstance(k, HexVector):
+            return HexVectoor(self.hx / k.hx, self.hy / k.hy)
+
+        if isinstance(k, int) or isinstance(k, float):
+            return HexVector(self.hx / k, self.hy / k)
+
+        raise ValueError("point muliplier must be hexvector or scalar")
+
     def rotate(self, hextant):
         """
         TBD

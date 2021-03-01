@@ -1,5 +1,6 @@
-from .point import Point
+from lxml import etree
 
+from .point import Point
 
 class Tile:
     """

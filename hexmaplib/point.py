@@ -1,3 +1,5 @@
+from .hexvector import HexVector
+
 class Point:
     """
     This class implements some simple vector algebra for cartesian coodinates
@@ -5,12 +7,16 @@ class Point:
     a region with the origin at one corner.
     """
 
-    def __init__(self, x, y):
+    def __init__(self, x, y=None):
         """
         Create a Point object with cartesian components
         """
-        self.x = x
-        self.y = y
+        if isinstance(x, HexVector) and y is None:
+            self.x = x.hx
+            self.y = x.hy
+        else:
+            self.x = x
+            self.y = y
 
     def __str__(self):
         """
@@ -53,7 +59,7 @@ class Point:
 
         raise ValueError("point muliplier must be point or scalar")
 
-    def __div__(self, k):
+    def __truediv__(self, k):
         """
         Inverse Cartesian dot-product of a vector and scalar value
         """
