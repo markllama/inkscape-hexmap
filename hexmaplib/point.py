@@ -53,6 +53,18 @@ class Point:
 
         raise ValueError("point muliplier must be point or scalar")
 
+    def __div__(self, k):
+        """
+        Inverse Cartesian dot-product of a vector and scalar value
+        """
+        if isinstance(k, Point):
+            return Point(self.x / k.x, self.y / k.y)
+
+        if isinstance(k, int) or isinstance(k, float):
+            return Point(self.x / k, self.y / k)
+
+        raise ValueError("point muliplier must be point or scalar")
+
     @property
     def swap(self):
         """
