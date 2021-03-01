@@ -97,40 +97,6 @@ class HexmapEffect(inkex.Effect):
         'herringbone': HerringboneGeometry
     }
 
-    @property
-    def map_spec(self):
-        """
-        Collect the map parameters for easy access
-        """
-        # TBD - check the value of the grid selection
-        grid = HexmapEffect._grids[self.options.shape](
-            HexVector(self.options.size_hx, self.options.size_hy))
-
-        geometry = HexmapEffect._geometries[self.options.geometry](
-            HexVector(self.options.size_hx, self.options.size_hy))
-
-        spec = {
-            'geometry': geometry,
-            'grid': grid,
-            'orientation': self.options.orientation, # or horizontal
-            'pad': self.options.pad,
-            'tile_size': self.options.hexsize,
-            'tile_shape': self.options.tileshape,
-            'border_style': self.options.border_style,
-            'tic_size': self.options.tic_size / 200,  # 1/2 of a percentage
-            'center_dot': self.options.center_dot,
-            'label': self.options.label,
-            'wrap_x': self.options.wrap_x,
-            'wrap_y': self.options.wrap_y,
-            'reverse_x': False,
-            'reverse_y': False,
-            'sawtooth': self.options.sawtooth,
-            # drawing spec
-            'units': self.options.units,
-            'stroke_width': self.options.strokewidth / 100.0
-        }
-
-        return spec
 
     def _add_map_parser(self):
         """
