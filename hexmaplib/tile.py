@@ -1,4 +1,7 @@
-class HexTile:
+from .point import Point
+
+
+class Tile:
     """
     TBD
     """
@@ -29,7 +32,8 @@ class HexTile:
 
     def __init__(self, center, size, side='interior'):
         """
-        TBD
+        place the tile on a canvas.
+        center and size are in convas units
         """
         self._center = center
         self._size = size
@@ -156,7 +160,7 @@ class HexTile:
             return line
 
 
-class BrickTile(HexTile):
+class BrickTile(Tile):
     """
     TBD
     """
