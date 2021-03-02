@@ -20,7 +20,8 @@ class RadialHexGrid:
 
     @property
     def size(self):
-        return self._size
+        diameter = self._radius * 2 + 1
+        return HexVector(diameter, diameter)
 
     @property
     def _radius(self):
@@ -81,7 +82,7 @@ class RadialHexGrid:
         """
         TBD
         """
-        return Point(self._rectwidth / 2,  self._rectheight / 2)
+        return HexVector(self._rectwidth/2, self._rectheight/2)
         
     def rectloc(self, loc):
         """
@@ -90,7 +91,9 @@ class RadialHexGrid:
         For a radial grid, the origin hex is in the center of the rectangular
         space.
         """
-        return self._rectorigin + (Point(loc.hx, loc.hy) * Point(3, 2))
+
+        bias = HexVector(0, -loc.hx/2)
+        return self._rectorigin + ((HexVector(1, 1) + loc + bias) * HexVector(3, 2))
 
 
 class RectangleHexGrid(RadialHexGrid):

@@ -75,7 +75,7 @@ class Canvas:
         """
         TBD
         """
-        return self.tile_size * Point(3, 2)
+        return self.tile_size
 
     @property
     def padding(self):
@@ -88,10 +88,10 @@ class Canvas:
         tdim = self.tile_size
 
         # the size of the grid in tile units (hexrun,hexrise)
-        hsize = (self._gridsize * HexVector(3, 2)) + HexVector(1, 1)
+        hsize = (self._gridsize * HexVector(3, 2)) - HexVector(1, 1)
         
         # the size of the grid in canvas units
-        msize = tdim * Point(hsize.hx, hsize.hy)
+        msize = tdim * Point(hsize)
 
         # The amount of unused space on the canvas
         excess = self.size - msize

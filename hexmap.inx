@@ -7,7 +7,7 @@
       <label appearance="header">Dimensions</label>
       <hbox>
         <label>Shape</label>
-        <param name="geometry" type="enum" gui-text="Hexmap Shape">
+        <param name="shape" type="enum" gui-text="Hexmap Shape">
           <item value="rectangle">Rectangle</item>
           <item value="radial">Radial</item>
         </param>

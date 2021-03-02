@@ -221,10 +221,10 @@ class HexmapEffect(inkex.Effect):
 
         gridsize = HexVector(self.options.size_hx, self.options.size_hy)
         gridorigin = HexVector(self.options.origin_hx, self.options.origin_hy)
-        hexcanvas = Canvas(svg, gridsize)
-        # TBD - check the value of the grid selection
         grid = HexmapEffect._grids[self.options.shape](gridsize)
         geometry = HexmapEffect._geometries[self.options.geometry](gridorigin)
+        hexcanvas = Canvas(svg, grid.size)
+        # TBD - check the value of the grid selection
 
         # --------------------------------------------------------------------
         #
@@ -242,7 +242,7 @@ class HexmapEffect(inkex.Effect):
             # get the location of that placement from the canvas
             
             # multiply that by the tile step and add the padding
-            center = (Point(maploc) * tilestep) + padding
+            center = Point(grid.rectloc(maploc)) * tilestep
             tile = Tile(center, tilesize)
             layer.append(tile.draw(
                 hexcanvas.stroke_width,
