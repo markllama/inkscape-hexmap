@@ -68,21 +68,21 @@ class RadialHexGrid:
         """
         TBD
         """
-        return (self._radius * 4) - 2
+        return (self._radius * 2) + 1
 
     @property
     def _rectwidth(self):
         """
         TBD
         """
-        return (self._radius * 6) - 2
+        return (self._radius * 2) + 1.5
 
     @property
     def _rectorigin(self):
         """
         TBD
         """
-        return HexVector(self._rectwidth/2, self._rectheight/2)
+        return Point(self._rectwidth/2, self._rectheight/2)
         
     def rectloc(self, loc):
         """
@@ -93,13 +93,17 @@ class RadialHexGrid:
         """
 
         bias = HexVector(0, -loc.hx/2)
-        return self._rectorigin + ((HexVector(1, 1) + loc + bias) * HexVector(3, 2))
+        return Point(loc + bias) + self._rectorigin
 
 
 class RectangleHexGrid(RadialHexGrid):
     """
     TBD
     """
+
+    @property
+    def size(self):
+        return self._size
 
     def column(self,hx):
         """
@@ -114,7 +118,7 @@ class RectangleHexGrid(RadialHexGrid):
         """
         """
         for hx in range(0, self._size.hx):
-            min = hx % 2
+            min = int(hx / 2)
             for hy in range(min, min + self._size.hy):
                 yield HexVector(hx, hy)
 
@@ -123,4 +127,5 @@ class RectangleHexGrid(RadialHexGrid):
         """
         TBD
         """
-        return Point(1,  2)
+        return Point(0.75, 1.0)
+

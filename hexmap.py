@@ -233,6 +233,9 @@ class HexmapEffect(inkex.Effect):
         tilesize = hexcanvas.tile_size
         tilestep = hexcanvas.tile_step
         padding = hexcanvas.padding
+        stroke_width = hexcanvas.stroke_width
+        # adjust for the thickness of the border line drawing
+        line_pack = Point(stroke_width * 1.5, 0)
 
         # draw all of the hexes in the grid
         for gridloc in grid.hexes:
@@ -242,7 +245,7 @@ class HexmapEffect(inkex.Effect):
             # get the location of that placement from the canvas
             
             # multiply that by the tile step and add the padding
-            center = Point(grid.rectloc(maploc)) * tilestep
+            center = (grid.rectloc(maploc) * tilestep) + padding - line_pack
             tile = Tile(center, tilesize)
             layer.append(tile.draw(
                 hexcanvas.stroke_width,

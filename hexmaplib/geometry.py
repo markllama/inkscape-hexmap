@@ -65,15 +65,13 @@ class RectangleGeometry(TriangleGeometry):
         Transform the map coordinate to the canonical grid
         """
         normal = src - self._origin
-        bias = int(normal.hx / 2)
-        return HexVector(normal.hx, normal.hy + bias)
+        return HexVector(normal.hx, normal.hy)
 
     def tomap(self, dst):
         """
         Transform a grid coordinate to the map location
         """
-        bias = int(dst.hx / 2)
-        return self._origin + HexVector(dst.hx, dst.hy - bias)
+        return self._origin + HexVector(dst.hx, dst.hy)
 
 
 class HerringboneGeometry(TriangleGeometry):
