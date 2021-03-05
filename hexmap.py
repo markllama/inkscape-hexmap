@@ -223,7 +223,8 @@ class HexmapEffect(inkex.Effect):
         gridorigin = HexVector(self.options.origin_hx, self.options.origin_hy)
         grid = HexmapEffect._grids[self.options.shape](gridsize)
         geometry = HexmapEffect._geometries[self.options.geometry](gridorigin)
-        hexcanvas = Canvas(svg, grid.size)
+        hexcanvas = Canvas(svg, grid.size,
+                           stroke_percent=self.options.strokewidth / 100)
         # TBD - check the value of the grid selection
 
         # --------------------------------------------------------------------
@@ -235,7 +236,7 @@ class HexmapEffect(inkex.Effect):
         padding = hexcanvas.padding
         stroke_width = hexcanvas.stroke_width
         # adjust for the thickness of the border line drawing
-        line_pack = Point(stroke_width * 1.5, 0)
+        line_pack = Point(stroke_width * 3, 0)
 
         # draw all of the hexes in the grid
         for gridloc in grid.hexes:

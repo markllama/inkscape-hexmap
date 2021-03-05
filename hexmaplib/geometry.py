@@ -86,11 +86,11 @@ class HerringboneGeometry(TriangleGeometry):
         """
         TBD
         """
-        return HexVector(-src.hz, src.hx)
+        return HexVector(-src.hz, src.hx) - self._origin
 
     def tomap(self, src):
         """
         TBD
         """
-        return HexVector(src.hy, src.hz)
+        return self._origin + HexVector(src.hy, src.hz)
 
