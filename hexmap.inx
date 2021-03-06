@@ -15,9 +15,9 @@
       <hbox>
         <label>Geometry</label>
         <param name="geometry" type="enum" gui-text="Hexmap Cooordinate System">
-          <item value="triangle">Triangle</item>
           <item value="rectangle">Rectangle</item>
           <item value="herringbone">Herringbone</item>
+          <item value="triangle">Triangle</item>
         </param>
       </hbox>
       <hbox>

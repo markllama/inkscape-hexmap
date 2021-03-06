@@ -252,7 +252,7 @@ class HexmapEffect(inkex.Effect):
                 hexcanvas.stroke_width,
                 self.options.orientation,
                 self.options.border_style,
-                self.options.tic_size,
+                self.options.tic_size / 100,
                 self.options.center_dot
             ))
             if self.options.label:
