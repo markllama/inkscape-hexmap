@@ -64,14 +64,14 @@ class RectangleGeometry(TriangleGeometry):
         """
         Transform the map coordinate to the canonical grid
         """
-        normal = src - self._origin
-        return HexVector(normal.hx, normal.hy)
+        normal = src - self._origin - HexVector(0, int(src.hx/2))
+        return normal
 
     def tomap(self, dst):
         """
         Transform a grid coordinate to the map location
         """
-        return self._origin + HexVector(dst.hx, dst.hy)
+        return self._origin +  dst
 
 
 class HerringboneGeometry(TriangleGeometry):
@@ -86,11 +86,11 @@ class HerringboneGeometry(TriangleGeometry):
         """
         TBD
         """
-        return HexVector(-src.hz, src.hx) - self._origin
+        return (src - self._origin).rotate(-1)
 
     def tomap(self, src):
         """
         TBD
         """
-        return self._origin + HexVector(src.hy, src.hz)
+        return src
 

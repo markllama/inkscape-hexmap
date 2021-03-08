@@ -256,7 +256,7 @@ class HexmapEffect(inkex.Effect):
                 self.options.center_dot
             ))
             if self.options.label:
-                label = HexLabel(gridloc, 'interior')
+                label = HexLabel(geometry.togrid(gridloc), 'interior')
                 layer.append(label.draw(tile.label_center, tilesize.y/5))
 
 # ============================================================================
