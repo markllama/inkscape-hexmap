@@ -219,10 +219,10 @@ class HexmapEffect(inkex.Effect):
         layer = createLayer('hexmap')
         append_if_new_name(svg, layer)
 
-        gridsize = HexVector(self.options.size_hx, self.options.size_hy)
         gridorigin = HexVector(self.options.origin_hx, self.options.origin_hy)
+        gridsize = HexVector(self.options.size_hx, self.options.size_hy)
         grid = HexmapEffect._grids[self.options.shape](gridsize)
-        geometry = HexmapEffect._geometries[self.options.geometry](gridorigin)
+        geometry = HexmapEffect._geometries[self.options.geometry](gridorigin, gridsize)
         hexcanvas = Canvas(svg, grid.size,
                            stroke_percent=self.options.strokewidth / 100)
         # TBD - check the value of the grid selection

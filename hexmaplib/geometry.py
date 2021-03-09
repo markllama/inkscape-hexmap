@@ -35,12 +35,13 @@ class TriangleGeometry:
     applied is translation of each hex in relation to the origin.
     """
 
-    def __init__(self, origin=HexVector.ORIGIN):
+    def __init__(self, origin=HexVector.ORIGIN, size=HexVector.ORIGIN):
         """
         The triangle geometry is the Identity geometry.  It makes no change
         to the canonical triangle geometry
         """
         self._origin = origin
+        self._size = size
 
     def togrid(self, src):
         """
@@ -64,14 +65,13 @@ class RectangleGeometry(TriangleGeometry):
         """
         Transform the map coordinate to the canonical grid
         """
-        normal = src - self._origin - HexVector(0, int(src.hx/2))
-        return normal
+        return src - self._origin - HexVector(0, int(src.hx/2))
 
     def tomap(self, dst):
         """
         Transform a grid coordinate to the map location
         """
-        return self._origin +  dst
+        return dst
 
 
 class HerringboneGeometry(TriangleGeometry):
@@ -86,11 +86,12 @@ class HerringboneGeometry(TriangleGeometry):
         """
         TBD
         """
-        return (src - self._origin).rotate(-1)
+        offset = HexVector(int(self._size.hx / 2), 0)
+        return (src - self._origin - offset).rotate(-1)
 
-    def tomap(self, src):
+    def tomap(self, dst):
         """
         TBD
         """
-        return src
+        return dst
 
