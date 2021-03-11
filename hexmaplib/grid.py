@@ -116,6 +116,7 @@ class RectangleHexGrid(RadialHexGrid):
     @property
     def hexes(self):
         """
+        TBD
         """
         for hx in range(0, self._size.hx):
             min = int(hx / 2)
@@ -129,3 +130,32 @@ class RectangleHexGrid(RadialHexGrid):
         """
         return Point(0.75, 1.0)
 
+
+class MegahexGrid(RectangleHexGrid):
+    """
+    """
+
+    @property
+    def size(self):
+        return HexVector(self._size.hx * 3 + self._size.hy, self._size.hy * 2 + 1)
+
+    @property
+    def centers(self):
+        hx_offset = HexVector(1, 3)
+        hy_offset = HexVector(2, -1)
+        for hx in range(0, self._size.hx):
+            min = int(hx / 2)
+            for hy in range(min, min + self._size.hy):
+                yield ((hx_offset * hx) + (hy_offset * hy)).rotate(2)
+        
+    @property
+    def hexes(self):
+        """
+        TBD
+        """
+
+        for center in self.centers:
+            yield center
+            for u in HexVector.UNIT:
+                yield center + u
+    

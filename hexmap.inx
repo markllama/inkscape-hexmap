@@ -10,6 +10,7 @@
         <param name="shape" type="enum" gui-text="Hexmap Shape">
           <item value="rectangle">Rectangle</item>
           <item value="radial">Radial</item>
+          <item value="megahex">Megahex</item>
         </param>
       </hbox>
       <hbox>

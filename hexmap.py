@@ -88,7 +88,8 @@ class HexmapEffect(inkex.Effect):
 
     _grids = {
         'rectangle': RectangleHexGrid,
-        'radial': RadialHexGrid
+        'radial': RadialHexGrid,
+        'megahex': MegahexGrid,
     }
 
     _geometries = {
@@ -103,7 +104,7 @@ class HexmapEffect(inkex.Effect):
         add Map dimension and layout arguments
         """
         map_parser = self.arg_parser.add_argument_group("map parameters")
-        map_parser.add_argument('--shape', choices = ['rectangle', 'radial'],
+        map_parser.add_argument('--shape', choices = ['rectangle', 'radial', 'megahex'],
                                 default = 'rectangle',
                                 help = "Hexmap Shape")
         map_parser.add_argument('--geometry',
